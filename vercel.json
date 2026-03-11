@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install --legacy-peer-deps && npm run build",
+  "buildCommand": "rm -f package-lock.json && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm install --legacy-peer-deps"
+  "installCommand": "rm -f package-lock.json && npm install --legacy-peer-deps"
 }
