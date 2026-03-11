@@ -11,6 +11,14 @@ import { samplePlans } from '@/data/samplePlans';
 const productTypes = ['All', 'Residential', 'Commercial', 'Apartments', 'Hotels & Lodges'];
 const bedroomOptions = ['Any', '1', '2', '3', '4', '5+'];
 const floorOptions = ['Any', '1', '2', '3+'];
+const priceRanges = [
+  { label: 'Under $150', min: 0, max: 150 },
+  { label: '$150 - $300', min: 150, max: 300 },
+  { label: '$300 - $500', min: 300, max: 500 },
+  { label: '$500 - $1000', min: 500, max: 1000 },
+  { label: '$1000 - $2000', min: 1000, max: 2000 },
+  { label: '$2000+', min: 2000, max: Infinity },
+];
 
 export default function Shop() {
   const [searchParams] = useSearchParams();
@@ -18,6 +26,7 @@ export default function Shop() {
   const [category, setCategory] = useState(searchParams.get('category') || 'All');
   const [bedrooms, setBedrooms] = useState(searchParams.get('bedrooms') || 'Any');
   const [floors, setFloors] = useState('Any');
+  const [priceRange, setPriceRange] = useState('Any');
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -37,6 +46,12 @@ export default function Shop() {
       const f = parseInt(floors);
       plans = plans.filter(p => floors === '3+' ? p.floors >= 3 : p.floors === f);
     }
+    if (priceRange !== 'Any') {
+      const range = priceRanges.find(r => r.label === priceRange);
+      if (range) {
+        plans = plans.filter(p => p.base_price >= range.min && p.base_price <= range.max);
+      }
+    }
 
     switch (sortBy) {
       case 'price-low': plans.sort((a, b) => a.base_price - b.base_price); break;
@@ -46,7 +61,7 @@ export default function Shop() {
     }
 
     return plans;
-  }, [search, category, bedrooms, floors, sortBy]);
+  }, [search, category, bedrooms, floors, priceRange, sortBy]);
 
   return (
     <Layout>
@@ -147,6 +162,33 @@ export default function Shop() {
                         className="h-4 w-4 text-primary"
                       />
                       {opt === 'Any' ? 'Any' : `${opt} Floor${opt !== '1' ? 's' : ''}`}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm mb-3">Price Range</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="price"
+                      checked={priceRange === 'Any'}
+                      onChange={() => setPriceRange('Any')}
+                      className="h-4 w-4 text-primary"
+                    />
+                    Any Price
+                  </label>
+                  {priceRanges.map((range) => (
+                    <label key={range.label} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="radio"
+                        name="price"
+                        checked={priceRange === range.label}
+                        onChange={() => setPriceRange(range.label)}
+                        className="h-4 w-4 text-primary"
+                      />
+                      {range.label}
                     </label>
                   ))}
                 </div>
